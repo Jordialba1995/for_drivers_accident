@@ -7,6 +7,7 @@ from aiogram.fsm.state import StatesGroup, State, default_state
 from keyboards import make_row_keyboard
 
 
+
 hello_message = 'чат бот для водителя\nНажмите далее для отображения инструкции и списка документов'
 
 # items for keyboards
