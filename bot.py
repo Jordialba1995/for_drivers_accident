@@ -3,6 +3,8 @@ import logging
 from aiogram import Bot, Dispatcher, types
 from aiogram import F
 from aiogram.filters.command import Command
+from aiogram.fsm.storage.memory import MemoryStorage
+
 
 import steps
 from config_reader import config
