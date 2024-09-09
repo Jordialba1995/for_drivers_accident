@@ -76,7 +76,7 @@ async def fio_incorrectly(message: Message, state: FSMContext):
         text='Введите ФИО еще раз',
         reply_markup=make_row_keyboard(y_n)
     )
-    await state.set_state(driver_info.save_fio)
+    await state.set_state(driver_info.driver_name)
 
 
 @router.message(driver_info.save_fio,
