@@ -30,24 +30,6 @@ dp.include_routers(steps.router)
 
 
 
-# @dp.message(Command('start'))
-# async def cmd_start(message: types.Message):
-#     await message.answer('Hello')
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 if __name__ == '__main__':

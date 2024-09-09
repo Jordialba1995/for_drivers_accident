@@ -65,7 +65,8 @@ async def vvod_fio(message: Message, state: FSMContext):
     await message.answer(
         text=f'Ваше ФИО: {message.text.title()}',
         reply_markup=make_row_keyboard(y_n))
-    await state.set_state(driver_info.save_fio)
+    # await state.set_state(driver_info.repeat_fio)
+    await state.set_state(driver_info.repeat_fio)
 
 
 @router.message(driver_info.repeat_fio,
@@ -81,10 +82,10 @@ async def fio_incorrectly(message: Message, state: FSMContext):
 @router.message(driver_info.save_fio,
                 F.text.in_(y_n[0]))
 async def upload_1(message: Message, state: FSMContext):
+    await state.update_data(driver_fio=message.text.title())
     await message.answer(
         text='teper zagruzite foto 2'
     )
-
     await state.set_state((driver_info.upload_photo_2))
 
 # @router.message(driver_info.driver_name)
