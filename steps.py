@@ -32,17 +32,33 @@ class driver_info(StatesGroup):
 
 
 # nachalnoe vhojdenie
-@router.message(StateFilter(None), Command('start'))
+@router.message(Command(commands=['start']))
 async def cmd_start(message: Message, state: FSMContext):
     await state.set_state(driver_info.zero_state)
     await message.answer(
-        text=hello_message, parse_mode='HTML',
-        reply_markup=make_row_keyboard(next_step)
-
+        text=hello_message,
+        reply_markup=ReplyKeyboardRemove()
     )
     # Устанавливаем пользователю состояние "выбирает название"
     await state.set_state(driver_info.send_instruction)
 
+@router.message(StateFilter(None), Command(commands=['cancel']))
+@router.message(default_state, F.text.lower() == 'отмена')
+async def cmd_cancel_no_state(messsage:Message, state: FSMContext):
+    await state.set_state({})
+    await messsage.answer(
+        text='Нечего менять',
+        reply_markup=ReplyKeyboardRemove()
+    )
+
+@router.message(Command(commands=["cancel"]))
+@router.message(F.text.lower() == "отмена")
+async def cmd_cancel(message: Message, state: FSMContext):
+    await state.clear()
+    await message.answer(
+        text="Действие отменено",
+        reply_markup=ReplyKeyboardRemove()
+    )
 
 # send instruction
 @router.message(
@@ -88,11 +104,6 @@ async def upload_1(message: Message, state: FSMContext):
     )
     await state.set_state((driver_info.upload_photo_2))
 
-# @router.message(driver_info.driver_name)
-# async def vvod_fio_incorrectly(message:Message):
-#     await message.answer(
-#         text='неправильное введено\n'
-#             'vvedi zanovo fio',
-#
-#         reply_markup=make_row_keyboard(next_step)
-#     )
+
+
+
