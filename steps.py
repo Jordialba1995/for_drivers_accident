@@ -6,21 +6,19 @@ from aiogram.fsm.state import StatesGroup, State, default_state
 
 from keyboards import make_row_keyboard
 
-
-
 hello_message = 'чат бот для водителя\nНажмите далее для отображения инструкции и списка документов'
 
 # items for keyboards
 next_step = ['Далее']
+y_n = ['Да', 'Нет']
 
 # texts
 instruction = 'ИНСТРУКЦИЯ'
 
-
 router = Router()
 
 
-class CheckExist(StatesGroup):
+class driver_info(StatesGroup):
     # 0
     zero_state = State()
     # otpravlyaem instr po dokam i foto
@@ -28,55 +26,68 @@ class CheckExist(StatesGroup):
     # zapisivaem fio
     driver_name = State()
     # zagruzka foto 1
-    upload_photo_1 = State()
+    repeat_fio = State()
+    save_fio = State()
+    upload_photo_2 = State()
 
 
 # nachalnoe vhojdenie
 @router.message(StateFilter(None), Command('start'))
 async def cmd_start(message: Message, state: FSMContext):
-    await state.set_state(CheckExist.zero_state)
+    await state.set_state(driver_info.zero_state)
     await message.answer(
         text=hello_message, parse_mode='HTML',
         reply_markup=make_row_keyboard(next_step)
 
     )
     # Устанавливаем пользователю состояние "выбирает название"
-    await state.set_state(CheckExist.send_instruction)
+    await state.set_state(driver_info.send_instruction)
 
 
 # send instruction
 @router.message(
-    CheckExist.send_instruction,
-    F.text.in_(next_step)
-)
+    driver_info.send_instruction,
+    F.text.in_(next_step))
 async def send_instruction(message: Message, state: FSMContext):
     await message.answer(text=instruction)
     await message.answer(
         text='Введите Фамилию, Имя, Отчество ЧЕРЕЗ ПРОБЕЛ\nПример: Иванов Иван Иванович', parse_mode='HTML',
         reply_markup=ReplyKeyboardRemove()
     )
-    if message.text is None:
-        await message.answer(
-            text='неправильное введено\n'
-                 'vvedi zanovo fio')
-    await state.set_state(CheckExist.driver_name)
+    await state.set_state(driver_info.driver_name)
 
 
 # zapisivaem fio
-@router.message(
-    CheckExist.driver_name,
-    F.text.in_(driver)
-)
+@router.message(driver_info.driver_name
+                # F.text.in_ #                                ????
+                )
 async def vvod_fio(message: Message, state: FSMContext):
-
-    # await state.update_data(driver_name=message.text.title())
     await message.answer(
-        text='Теперь загрузите фото одно за другим',
-        reply_markup=make_row_keyboard(next_step)
-    )
-    await state.set_state(CheckExist.upload_photo_1)
+        text=f'Ваше ФИО: {message.text.title()}',
+        reply_markup=make_row_keyboard(y_n))
+    await state.set_state(driver_info.save_fio)
 
-# @router.message(CheckExist.driver_name)
+
+@router.message(driver_info.repeat_fio,
+                F.text.in_(y_n[1]))
+async def fio_incorrectly(message: Message, state: FSMContext):
+    await message.answer(
+        text='Введите ФИО еще раз',
+        reply_markup=make_row_keyboard(y_n)
+    )
+    await state.set_state(driver_info.save_fio)
+
+
+@router.message(driver_info.save_fio,
+                F.text.in_(y_n[0]))
+async def upload_1(message: Message, state: FSMContext):
+    await message.answer(
+        text='teper zagruzite foto 2'
+    )
+
+    await state.set_state((driver_info.upload_photo_2))
+
+# @router.message(driver_info.driver_name)
 # async def vvod_fio_incorrectly(message:Message):
 #     await message.answer(
 #         text='неправильное введено\n'
@@ -84,10 +95,3 @@ async def vvod_fio(message: Message, state: FSMContext):
 #
 #         reply_markup=make_row_keyboard(next_step)
 #     )
-
-
-
-
-
-
-

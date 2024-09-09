@@ -9,7 +9,7 @@ from aiogram.fsm.storage.memory import MemoryStorage
 import steps
 from config_reader import config
 # импортируем файлы из каталога handlers/ и подключаем роутеры из этих файлов к диспетчеру. И здесь снова важен порядок импортов!
-# from handlers import questions, different_types
+# from handlers import handler_1
 
 
 async def main():
@@ -23,6 +23,7 @@ bot = Bot(token=config.bot_token.get_secret_value())
 
 # Диспетчер
 dp = Dispatcher()
+
 
 # регистрация роутеров
 dp.include_routers(steps.router)
