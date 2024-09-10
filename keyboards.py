@@ -21,7 +21,7 @@ def make_row_keyboard(items: list[str]) -> ReplyKeyboardMarkup:
     :return: объект реплай-клавиатуры
     """
     row = [KeyboardButton(text=item) for item in items]
-    return ReplyKeyboardMarkup(keyboard=[row], resize_keyboard=True)
+    return ReplyKeyboardMarkup(keyboard=[row], input_field_placeholder='/start, отмена', resize_keyboard=True)
 
 
 sklads = ['Смидович п/о', 'Усть-Кут', 'Хабаровск', 'Новобурейский п/о', 'Ямал', 'Алдан', 'Сахалин',

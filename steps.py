@@ -5,6 +5,7 @@ from aiogram.filters import Command, StateFilter
 from aiogram.fsm.state import StatesGroup, State, default_state
 
 from keyboards import make_row_keyboard
+from bot_functions import make_dir_my
 
 hello_message = 'чат бот для водителя\nНажмите далее для отображения инструкции и списка документов'
 
@@ -28,7 +29,7 @@ class driver_info(StatesGroup):
     # zagruzka foto 1
     repeat_fio = State()
     save_fio = State()
-    upload_photo_2 = State()
+    upload_photo_1 = State()
 
 
 # nachalnoe vhojdenie
@@ -37,11 +38,12 @@ async def cmd_start(message: Message, state: FSMContext):
     await state.set_state(driver_info.zero_state)
     await message.answer(
         text=hello_message,
-        reply_markup=ReplyKeyboardRemove()
+        reply_markup=make_row_keyboard(next_step)
     )
     # Устанавливаем пользователю состояние "выбирает название"
     await state.set_state(driver_info.send_instruction)
 
+# отмена когда стейт фильтер нон и когда в стейте
 @router.message(StateFilter(None), Command(commands=['cancel']))
 @router.message(default_state, F.text.lower() == 'отмена')
 async def cmd_cancel_no_state(messsage:Message, state: FSMContext):
@@ -82,7 +84,7 @@ async def vvod_fio(message: Message, state: FSMContext):
         text=f'Ваше ФИО: {message.text.title()}',
         reply_markup=make_row_keyboard(y_n))
     # await state.set_state(driver_info.repeat_fio)
-    await state.set_state(driver_info.repeat_fio)
+    await state.set_state(driver_info.save_fio)
 
 
 @router.message(driver_info.repeat_fio,
@@ -98,11 +100,14 @@ async def fio_incorrectly(message: Message, state: FSMContext):
 @router.message(driver_info.save_fio,
                 F.text.in_(y_n[0]))
 async def upload_1(message: Message, state: FSMContext):
-    await state.update_data(driver_fio=message.text.title())
+    #popravit update data, zapisivaet da, v make dir potom zakinut user datu
+    await state.update_data(driver_fio=message.text.title())      #, make_dir_my(message.text.title())
     await message.answer(
-        text='teper zagruzite foto 2'
+        text='teper zagruzite foto 1\n'
+             f'{message.text.title()}',
+        reply_markup=ReplyKeyboardRemove()
     )
-    await state.set_state((driver_info.upload_photo_2))
+    await state.set_state((driver_info.upload_photo_1))
 
 
 
