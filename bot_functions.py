@@ -11,3 +11,9 @@ def make_dir_my(driver_fio):
     if isdir_my is True:
         return path
 
+def validate_fio(string_fio: str):
+    fio_regex = re.findall(r'[А-ЯЁ][а-яё]+\s+[А-ЯЁ][а-яё]+(?:\s+[А-ЯЁ][а-яё]+)?', string_fio)
+    if len(fio_regex) > 0:
+        return True
+    else:
+        return False
