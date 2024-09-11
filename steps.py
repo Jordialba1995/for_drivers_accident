@@ -11,7 +11,9 @@ hello_message = 'чат бот для водителя\nНажмите дале�
 
 # items for keyboards
 next_step = ['Далее']
-y_n = ['Да', 'Нет']
+next_step_new = ['Далее', 'отмена']
+y_n = ['Да', 'Нет', 'отмена']
+
 
 # texts
 instruction = 'ИНСТРУКЦИЯ'
@@ -35,32 +37,31 @@ class driver_info(StatesGroup):
 # nachalnoe vhojdenie
 @router.message(Command(commands=['start']))
 async def cmd_start(message: Message, state: FSMContext):
-    await state.set_state(driver_info.zero_state)
+    await state.clear()
     await message.answer(
         text=hello_message,
         reply_markup=make_row_keyboard(next_step)
     )
-    # Устанавливаем пользователю состояние "выбирает название"
     await state.set_state(driver_info.send_instruction)
 
 # отмена когда стейт фильтер нон и когда в стейте
 @router.message(StateFilter(None), Command(commands=['cancel']))
-@router.message(default_state, F.text.lower() == 'отмена')
-async def cmd_cancel_no_state(messsage:Message, state: FSMContext):
-    await state.set_state({})
-    await messsage.answer(
-        text='Нечего менять',
-        reply_markup=ReplyKeyboardRemove()
-    )
+# @router.message(default_state, F.text.lower() == 'отмена')
+# async def cmd_cancel_no_state(messsage:Message, state: FSMContext):
+#     # await state.set_state({})
+#     await messsage.answer(
+#         text='Нечего менять',
+#         reply_markup=ReplyKeyboardRemove()
+#     )
 
-@router.message(Command(commands=["cancel"]))
-@router.message(F.text.lower() == "отмена")
-async def cmd_cancel(message: Message, state: FSMContext):
-    await state.clear()
-    await message.answer(
-        text="Действие отменено",
-        reply_markup=ReplyKeyboardRemove()
-    )
+# @router.message(Command(commands=["cancel"]))
+# @router.message(F.text.lower() == "отмена")
+# async def cmd_cancel(message: Message, state: FSMContext):
+#     await state.clear()
+#     await message.answer(
+#         text="Действие отменено",
+#         reply_markup=ReplyKeyboardRemove()
+#     )
 
 # send instruction
 @router.message(
@@ -80,11 +81,20 @@ async def send_instruction(message: Message, state: FSMContext):
                 # F.text.in_ #                                ????
                 )
 async def vvod_fio(message: Message, state: FSMContext):
+    await state.update_data(driver_fio=message.text.title())
     await message.answer(
         text=f'Ваше ФИО: {message.text.title()}',
         reply_markup=make_row_keyboard(y_n))
-    # await state.set_state(driver_info.repeat_fio)
     await state.set_state(driver_info.save_fio)
+
+
+# @router.message(F.text.lower() == "отмена")
+# async def cmd_cancel(message: Message, state: FSMContext):
+#     await message.answer(
+#         text="Действие отменено",
+#         reply_markup=ReplyKeyboardRemove()
+#     )
+#     await state.set_state(driver_info.send_instruction)
 
 
 @router.message(driver_info.repeat_fio,
@@ -100,11 +110,12 @@ async def fio_incorrectly(message: Message, state: FSMContext):
 @router.message(driver_info.save_fio,
                 F.text.in_(y_n[0]))
 async def upload_1(message: Message, state: FSMContext):
-    #popravit update data, zapisivaet da, v make dir potom zakinut user datu
-    await state.update_data(driver_fio=message.text.title())      #, make_dir_my(message.text.title())
+    # popravit update data, zapisivaet da, v make dir potom zakinut user datu
+    user_data = await state.get_data()
+    make_dir_my(user_data['driver_fio'])
     await message.answer(
         text='teper zagruzite foto 1\n'
-             f'{message.text.title()}',
+             f'{user_data['driver_fio']} - проверка фио',
         reply_markup=ReplyKeyboardRemove()
     )
     await state.set_state((driver_info.upload_photo_1))
