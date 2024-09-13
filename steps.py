@@ -6,7 +6,7 @@ from aiogram.fsm.state import StatesGroup, State, default_state
 from _datetime import *
 
 from keyboards import make_row_keyboard
-from bot_functions import make_dir_my, validate_fio
+from bot_functions import make_dir_my, validate_fio, comments
 
 hello_message = 'чат бот для водителя\nНажмите далее для отображения инструкции и списка документов'
 
@@ -37,18 +37,22 @@ class Driver_Info(StatesGroup):
     photo_1 = State()
     uploading_photo_1 = State()
     uploaded_photo_1 = State()
+    com_1 = State()
     # photo 2
     photo_2 = State()
     uploading_photo_2 = State()
     uploaded_photo_2 = State()
+    com_2 = State()
     # photo 3
     photo_3 = State()
     uploading_photo_3 = State()
     uploaded_photo_3 = State()
+    com_3 = State()
     # photo 4
     photo_4 = State()
     uploading_photo_4 = State()
     uploaded_photo_4 = State()
+    com_4 = State()
     # loading end
     the_end = State()
 
@@ -108,7 +112,7 @@ async def fio_correctly(message: Message, state: FSMContext):
     user_data = await state.get_data()
 
     path = make_dir_my(user_data['fio'])  # только вызов функции ???
-    # await state.update_data(path_to_f=path+'\\') # ????
+    await state.update_data(path_to_f=path+'\\')
 
     await message.answer(
         text='Теперь приложите фото ДТП с 4 разных сторон.\nПожалуйста, загружайте фото поэтапно, следуя кнопкам.',
@@ -177,10 +181,11 @@ async def photo1_loaded_correctly(message: Message, state: FSMContext):
     
     await message.bot.download(file=message.photo[-1].file_id, destination=user_data['path_to_f'] + datetime.today().strftime('%d%m%Y_%H%M%S') + '_photo1.jpg')
     await message.answer(
-        text='Вы загрузили Фото 1.\nТеперь загрузите Фото 2.',
-        reply_markup=make_row_keyboard(['Фото 2', 'Отмена'])
+        text='Вы загрузили Фото 1.\nТеперь введите комментарий к фото.',
+        reply_markup=ReplyKeyboardRemove()
+        # reply_markup=make_row_keyboard(['комментарий 1', 'Отмена'])
     )
-    await state.set_state(Driver_Info.photo_2)
+    await state.set_state(Driver_Info.com_1)
 
 # check for text photo 1
 @router.message(Driver_Info.uploaded_photo_1)
@@ -190,6 +195,17 @@ async def photo1_check_text(message: Message):
         reply_markup=make_row_keyboard(['Отмена'])
         )
 
+
+# com 1
+@router.message(Driver_Info.com_1,
+                F.text)
+async def com_1(message: Message, state: FSMContext):
+    await state.update_data(com_1=message.text)
+    await message.answer(
+        text='Вы загрузили комментарий 1.\nТеперь загрузите Фото 2.',
+        reply_markup=make_row_keyboard(['Фото 2', 'Отмена'])
+    )
+    await state.set_state(Driver_Info.photo_2)
 
 
 # cancel photo2 before just uploading
@@ -254,7 +270,21 @@ async def photo2_loaded_correctly(message: Message, state: FSMContext):
     user_data = await state.get_data()
     await message.bot.download(file=message.photo[-1].file_id, destination=user_data['path_to_f'] + datetime.today().strftime('%d%m%Y_%H%M%S') + '_photo2.jpg')
     await message.answer(
-        text='Вы загрузили Фото 2.\nТеперь загрузите Фото 3.',
+        text='Вы загрузили Фото 2.\nвведите комментарий к фото.',
+        reply_markup=ReplyKeyboardRemove()
+
+        # reply_markup=make_row_keyboard(['Фото 3', 'Отмена'])
+    )
+    await state.set_state(Driver_Info.com_2)
+
+
+# com 2
+@router.message(Driver_Info.com_2,
+                F.text)
+async def com_2(message: Message, state: FSMContext):
+    await state.update_data(com_2=message.text)
+    await message.answer(
+        text='Вы загрузили комментарий 2.\nТеперь загрузите Фото 3.',
         reply_markup=make_row_keyboard(['Фото 3', 'Отмена'])
     )
     await state.set_state(Driver_Info.photo_3)
@@ -314,10 +344,24 @@ async def photo3_loaded_correctly(message: Message, state: FSMContext):
     user_data = await state.get_data()
     await message.bot.download(file=message.photo[-1].file_id, destination=user_data['path_to_f'] + datetime.today().strftime('%d%m%Y_%H%M%S') + '_photo3.jpg')
     await message.answer(
-        text='Вы загрузили Фото 3.\nТеперь загрузите Фото 4.',
+        text='Вы загрузили Фото 3.\nТеперь введите комментарий к фото.',
+        reply_markup=ReplyKeyboardRemove()
+        # reply_markup=make_row_keyboard(['Фото 4', 'Отмена'])
+    )
+    await state.set_state(Driver_Info.com_3)
+
+
+# com 3
+@router.message(Driver_Info.com_3,
+                F.text)
+async def com_3(message: Message, state: FSMContext):
+    await state.update_data(com_3=message.text)
+    await message.answer(
+        text='Вы загрузили комментарий 3.\nТеперь загрузите Фото 4.',
         reply_markup=make_row_keyboard(['Фото 4', 'Отмена'])
     )
     await state.set_state(Driver_Info.photo_4)
+
 
 # photo 3 loaded cancel
 @router.message(Driver_Info.photo_3,
@@ -371,10 +415,26 @@ async def photo4_loaded_correctly(message: Message, state: FSMContext):
     user_data = await state.get_data()
     await message.bot.download(file=message.photo[-1].file_id, destination=user_data['path_to_f'] + datetime.today().strftime('%d%m%Y_%H%M%S') + '_photo4.jpg')
     await message.answer(
-        text='Вы загрузили Фото 4.\nЗагрузка фото завершена.',
+        text='Вы загрузили Фото 4.\nТеперь введите комментарий к фото.',
         reply_markup=make_row_keyboard(['В начало'])
     )
+    await state.set_state(Driver_Info.com_4)
+
+
+# com 4
+@router.message(Driver_Info.com_4,
+                F.text)
+async def com_4(message: Message, state: FSMContext):
+    await state.update_data(com_4=message.text)
+    user_data = await state.get_data()
+    comments(user_data['fio'], user_data['com_1'], user_data['com_2'], user_data['com_3'])
+    await message.answer(
+        text='Вы загрузили комментарий 4.\nЗагрузка фото завершена',
+        reply_markup=make_row_keyboard(['В начало'])
+    )
+    await message.answer(user_data['com_2'], user_data['com_3'])
     await state.set_state(Driver_Info.the_end)
+
 
 # photo 4 cancel
 @router.message(Driver_Info.photo_3,

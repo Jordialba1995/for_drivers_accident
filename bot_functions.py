@@ -22,10 +22,10 @@ def validate_fio(string_fio: str):
         return False
 
 # com doljen bit vlojennim spiskom [['tom', 'a', 'b', 'c', 'd']]
-def comments(com):
+def comments(*args):
     with open('com.csv', 'a', newline='') as file:
         writer = csv.writer(file)
-        writer.writerows(com)
+        writer.writerows(args)
 
 
 
