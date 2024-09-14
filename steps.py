@@ -432,8 +432,6 @@ async def com_4(message: Message, state: FSMContext):
         text='Вы загрузили комментарий 4.\nЗагрузка фото завершена',
         reply_markup=make_row_keyboard(['В начало'])
     )
-    await message.answer(text=f'{(user_data['fio'])}')
-    # await message.answer(text=f'{type(user_data['com_3'])}')
     await state.set_state(Driver_Info.the_end)
 
 
