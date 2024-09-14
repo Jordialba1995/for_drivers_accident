@@ -427,12 +427,13 @@ async def photo4_loaded_correctly(message: Message, state: FSMContext):
 async def com_4(message: Message, state: FSMContext):
     await state.update_data(com_4=message.text)
     user_data = await state.get_data()
-    comments(user_data['fio'], user_data['com_1'], user_data['com_2'], user_data['com_3'])
+    comments(user_data['fio'], user_data['com_1'], user_data['com_2'], user_data['com_3'], message.text)
     await message.answer(
         text='Вы загрузили комментарий 4.\nЗагрузка фото завершена',
         reply_markup=make_row_keyboard(['В начало'])
     )
-    await message.answer(user_data['com_2'], user_data['com_3'])
+    await message.answer(text=f'{(user_data['fio'])}')
+    # await message.answer(text=f'{type(user_data['com_3'])}')
     await state.set_state(Driver_Info.the_end)
 
 

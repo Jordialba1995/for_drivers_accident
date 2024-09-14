@@ -14,6 +14,7 @@ def make_dir_my(driver_fio):
     if isdir_my is True:
         return path
 
+
 def validate_fio(string_fio: str):
     fio_regex = re.findall(r'[А-ЯЁ][а-яё]+\s+[А-ЯЁ][а-яё]+(?:\s+[А-ЯЁ][а-яё]+)?', string_fio)
     if len(fio_regex) > 0:
@@ -21,11 +22,13 @@ def validate_fio(string_fio: str):
     else:
         return False
 
-# com doljen bit vlojennim spiskom [['tom', 'a', 'b', 'c', 'd']]
+
 def comments(*args):
-    with open('com.csv', 'a', newline='') as file:
+    args = [list(args)]
+    with open('com.csv', 'a', newline='', encoding="utf-8") as file:
         writer = csv.writer(file)
         writer.writerows(args)
+        print(args)
 
 
 
