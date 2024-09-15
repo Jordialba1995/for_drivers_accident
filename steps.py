@@ -87,6 +87,7 @@ async def send_instruction(message: Message, state: FSMContext):
     )
     await state.set_state(Driver_Info.driver_name)
 
+
 # zapisivaem fio
 @router.message(Driver_Info.driver_name)
 async def vvod_fio(message: Message, state: FSMContext):
@@ -103,6 +104,7 @@ async def vvod_fio(message: Message, state: FSMContext):
             text='Введите КОРРЕКТНУЮ Фамилию, Имя, Отчество через пробел\nПример: Иванов Иван Иванович', parse_mode='HTML')
         await state.set_state(Driver_Info.driver_name)
 
+
 # failed FIO
 @router.message(Driver_Info.repeat_fio,
                 F.text == y_n[1])
@@ -113,12 +115,12 @@ async def fio_incorrectly(message: Message, state: FSMContext):
     )
     await state.set_state(Driver_Info.driver_name)
 
+
 # successed FIO
 @router.message(Driver_Info.repeat_fio,
                 F.text == y_n[0])
 async def fio_correctly(message: Message, state: FSMContext):
     user_data = await state.get_data()
-
     path = make_dir_my(user_data['fio'])  # только вызов функции ???
     await state.update_data(path_to_f=path)
 
@@ -128,6 +130,7 @@ async def fio_correctly(message: Message, state: FSMContext):
     )
     await state.set_state(Driver_Info.photo_1)
 
+
 # check for text
 @router.message(Driver_Info.repeat_fio)
 async def repeat_fio_check_text(message: Message):
@@ -135,6 +138,7 @@ async def repeat_fio_check_text(message: Message):
         text='Вы попытались ввести текст, сначала нажмите кнопку.',
         reply_markup=make_row_keyboard(['Фото 1', 'Отмена'])
         )
+
 
 # photo1 cancel FIO
 @router.message(Driver_Info.photo_1,
@@ -147,6 +151,7 @@ async def photo_cancel(message: Message, state: FSMContext):
     )
     await state.set_state(Driver_Info.repeat_fio)
 
+
 # succed photo1
 @router.message(Driver_Info.photo_1,
                 F.text == 'Фото 1')
@@ -157,6 +162,7 @@ async def photo1_wait(message: Message, state: FSMContext):
     )
     await state.set_state(Driver_Info.uploaded_photo_1)
 
+
 # hz photo1
 @router.message(Driver_Info.photo_1)
 async def photo1_incorrect(message: Message, state: FSMContext):
@@ -166,6 +172,7 @@ async def photo1_incorrect(message: Message, state: FSMContext):
         reply_markup=make_row_keyboard(['Фото 1', 'Отмена'])
     )
     await state.set_state(Driver_Info.photo_1)
+
 
 # cancel uploaded photo1
 @router.message(Driver_Info.uploaded_photo_1,
@@ -190,9 +197,9 @@ async def photo1_loaded_correctly(message: Message, state: FSMContext):
     await message.answer(
         text='Вы загрузили Фото 1.\nТеперь введите комментарий к фото.',
         reply_markup=ReplyKeyboardRemove()
-        # reply_markup=make_row_keyboard(['комментарий 1', 'Отмена'])
     )
     await state.set_state(Driver_Info.com_1)
+
 
 # check for text photo 1
 @router.message(Driver_Info.uploaded_photo_1)
@@ -215,6 +222,7 @@ async def com_1(message: Message, state: FSMContext):
     )
     await state.set_state(Driver_Info.photo_2)
 
+
 # cancel photo2 before just uploading
 @router.message(Driver_Info.photo_2,
                 F.text == 'Отмена')
@@ -225,6 +233,7 @@ async def photo1_cancel(message: Message, state: FSMContext):
         reply_markup=make_row_keyboard(y_n)
     )
     await state.set_state(Driver_Info.repeat_fio)
+
 
 # photo 2
 @router.message(Driver_Info.photo_2,
@@ -248,6 +257,7 @@ async def photo2_cancel(message: Message, state: FSMContext):
     )
     await state.set_state(Driver_Info.repeat_fio)
 
+
 # hz photo2
 @router.message(Driver_Info.photo_2)
 async def photo2_incorrect(message: Message, state: FSMContext):
@@ -257,6 +267,7 @@ async def photo2_incorrect(message: Message, state: FSMContext):
         reply_markup=make_row_keyboard(['Фото 2', 'Отмена'])
     )
     await state.set_state(Driver_Info.photo_2)
+
 
 # check for text photo 2
 @router.message(Driver_Info.uploading_photo_2,
@@ -309,6 +320,7 @@ async def photo2_loaded_cancel(message: Message, state: FSMContext):
     )
     await state.set_state(Driver_Info.repeat_fio)
 
+
 # photo 3 OK
 @router.message(Driver_Info.photo_3,
                 F.text == 'Фото 3')
@@ -319,6 +331,7 @@ async def photo3_privet(message: Message, state: FSMContext):
     )
     await state.set_state(Driver_Info.uploading_photo_3)
 
+
 # hz photo3
 @router.message(Driver_Info.photo_3)
 async def photo3_incorrect(message: Message, state: FSMContext):
@@ -328,6 +341,7 @@ async def photo3_incorrect(message: Message, state: FSMContext):
         reply_markup=make_row_keyboard(['Фото 3', 'Отмена'])
     )
     await state.set_state(Driver_Info.photo_3)
+
 
 # check for text photo 3
 @router.message(Driver_Info.uploading_photo_3,
@@ -381,6 +395,7 @@ async def photo3_loaded_cancel(message: Message, state: FSMContext):
     )
     await state.set_state(Driver_Info.repeat_fio)
 
+
 # photo 3 OK
 @router.message(Driver_Info.photo_4,
                 F.text == 'Фото 4')
@@ -391,6 +406,7 @@ async def photo4_privet(message: Message, state: FSMContext):
     )
     await state.set_state(Driver_Info.uploading_photo_4)
 
+
 # hz photo4
 @router.message(Driver_Info.photo_4)
 async def photo2_incorrect(message: Message, state: FSMContext):
@@ -400,6 +416,7 @@ async def photo2_incorrect(message: Message, state: FSMContext):
         reply_markup=make_row_keyboard(['Фото 4', 'Отмена'])
     )
     await state.set_state(Driver_Info.photo_4)
+
 
 # photo 4 cancel
 @router.message(Driver_Info.uploading_photo_4,
@@ -463,6 +480,7 @@ async def photo4_loaded_cancel(message: Message, state: FSMContext):
         reply_markup=make_row_keyboard(y_n)
     )
     await state.set_state(Driver_Info.repeat_fio)
+
 
 # photo 4 OK
 @router.message(Driver_Info.the_end,

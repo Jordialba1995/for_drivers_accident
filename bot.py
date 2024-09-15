@@ -8,13 +8,12 @@ from aiogram.fsm.storage.memory import MemoryStorage
 
 import steps
 from config_reader import config
-# импортируем файлы из каталога handlers/ и подключаем роутеры из этих файлов к диспетчеру. И здесь снова важен порядок импортов!
-# from handlers import handler_1
 
 
 async def main():
     await bot.delete_webhook(drop_pending_updates=True)
     await dp.start_polling(bot)
+
 # Включаем логирование, чтобы не пропустить важные сообщения
 logging.basicConfig(level=logging.INFO)
 
